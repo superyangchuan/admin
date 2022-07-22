@@ -1,56 +1,18 @@
-import {
-  type FC,
-  type PropsWithChildren,
-  createContext,
-  useContext,
-  useState,
-  useCallback,
-  useMemo,
-} from 'react'
+import { type FC } from 'react'
 import { useLocation, Navigate, Outlet } from 'react-router-dom'
-import type { UserInfo } from '../interfaces'
+import { useSelectUserInfo } from '../store/slices/userInfoSlice'
 import { UserRole } from '../constants'
 
-interface AuthContextType {
-  userInfo: UserInfo
-  signIn: (userInfo: UserInfo, cb?: VoidFunction) => void
-  signOut: (cb?: VoidFunction) => void
-}
-
-const AuthContext = createContext<AuthContextType>(null!)
-export const useAuth = () => useContext(AuthContext)
-
-export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
-  const [userInfo, setUserInfo] = useState<UserInfo>(null!)
-
-  const signIn = useCallback((newUser: UserInfo, cb?: VoidFunction) => {
-    setUserInfo(newUser)
-    cb?.()
-  }, [])
-
-  const signOut = useCallback((cb?: VoidFunction) => {
-    setUserInfo(null!)
-    cb?.()
-  }, [])
-
-  const value = useMemo(
-    () => ({ userInfo, signIn, signOut }),
-    [userInfo, signIn, signOut]
-  )
-
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
-}
-
 interface RequireAuthProps {
-  role: keyof typeof UserRole | (keyof typeof UserRole)[]
+  role?: keyof typeof UserRole | (keyof typeof UserRole)[]
 }
 
 export const RequireAuth: FC<RequireAuthProps> = ({ role }) => {
-  const { userInfo } = useAuth()
+  const userInfo = useSelectUserInfo()
   const location = useLocation()
 
   // 未登录
-  if (!userInfo) {
+  if (!userInfo.userId) {
     return <Navigate to="/login" state={{ from: location }} replace />
   }
 

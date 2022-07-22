@@ -1,20 +1,24 @@
 import { Routes, Route } from 'react-router-dom'
-import { AuthProvider } from './contexts/auth'
 import BaseLayout from './layouts/BaseLayout'
-import Index from './pages'
+import { RequireAuth } from './contexts/auth'
+import Home from './pages/home'
+import NotAuth from './pages/NotAuth'
+import NotFound from './pages/NotFound'
 import Login from './pages/login'
 import './App.css'
 
 function App() {
   return (
-    <AuthProvider>
-      <Routes>
-        <Route element={<BaseLayout />}>
-          <Route path="/*" element={<Index />} />
+    <Routes>
+      <Route element={<BaseLayout />}>
+        <Route element={<RequireAuth />}>
+          <Route index element={<Home />} />
         </Route>
-        <Route path="/login" element={<Login />} />
-      </Routes>
-    </AuthProvider>
+        <Route path="no-auth" element={<NotAuth />} />
+        <Route path="*" element={<NotFound />} />
+      </Route>
+      <Route path="/login" element={<Login />} />
+    </Routes>
   )
 }
 
