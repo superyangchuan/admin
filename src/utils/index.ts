@@ -1,3 +1,3 @@
-import Event from './event'
+import EventBus from './event'
 
-export const eventBus = new Event()
+export const eventBus = new EventBus()
